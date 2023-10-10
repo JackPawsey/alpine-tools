@@ -17,14 +17,20 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
+      - name: Lowercase repository name
+        id: lowercase-repo-name
+        uses: ASzc/change-string-case-action@v2
+        with:
+          string: "${{ github.repository }}"
+
       - name: Build Docker Image
         run: |
             docker buildx create --use
-            docker buildx build --tag ghcr.io/${{ github.repository }}:latest ./docker
+            docker buildx build --tag ghcr.io/${{ steps.lowercase-repo-name.outputs.lowercase }}:latest ./docker
         env:
           DOCKER_BUILDKIT: 1
 
       - name: Publish Docker Image on Tag
         if: startsWith(github.ref, 'refs/tags/')
         run: |
-          docker push ghcr.io/${{ github.repository }}:latest
+          docker push ghcr.io/${{ steps.lowercase-repo-name.outputs.lowercase }}:latest
