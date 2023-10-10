@@ -1,0 +1,30 @@
+name: Build and Publish Docker Image
+
+on:
+  push:
+    branches: "*"
+    tags: "*"
+  workflow_dispatch:
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build Docker Image
+        run: |
+            docker buildx create --use
+            docker buildx build --tag ghcr.io/${{ github.repository }}:latest ./docker
+        env:
+          DOCKER_BUILDKIT: 1
+
+      - name: Publish Docker Image on Tag
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          docker push ghcr.io/${{ github.repository }}:latest
