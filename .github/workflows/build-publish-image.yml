@@ -28,5 +28,6 @@ jobs:
           context: ./docker
           file: ./docker/Dockerfile
           tags: ghcr.io/${{ steps.lowercase-repo-name.outputs.lowercase }}:latest
+          push: true
         env:
           DOCKER_BUILDKIT: 1
